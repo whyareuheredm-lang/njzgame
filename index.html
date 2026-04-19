@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>bunny game</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <script
+      type="module"
+      src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"
+    ></script>
+
+    <style>
+      body {
+          margin: 0;
+            overflow: hidden;
+
+              background: url("binkyb.png") center/cover no-repeat;
+
+      }
+
+      #score {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        color: white;
+        font-size: 20px;
+        z-index: 10;
+      }
+
+      .bunny {
+        position: fixed;
+        width: 60px;
+        cursor: pointer;
+        transition: transform 0.2s;
+        z-index:5;
+      }
+
+      .bunny:active {
+        transform: scale(0.8);
+      }
+
+      .boss {
+        position: fixed;
+        width: 60px;
+
+        overflow: visible; /* * BAЖНO */
+
+        z-index: 5;
+        cursor: pointer;
+        animation: float 2s ease-in-out infinite;
+      }
+
+      @keyframes float {
+        0% {
+          transform: translateY(0px);
+        }
+        50% {
+          transform: translateY(-20px);
+        }
+        100% {
+          transform: translateY(0px);
+        }
+        button
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 10;
+
+      }
+    </style>
+  </head>
+
+  <body>
+    <img src="bong.png" class="pulse-bg" />
+
+    <audio id="bgMusic"></audio>
+    <div id="score">0</div>
+    <div class="title">NEWJEANS GAME ZONE</div>
+    <div class="player">
+      <img src="player.png" class="player-bg" id="playerImg" />
+
+      <div class="controls">
+        <div class="btn prev" onclick="nextTrack()"></div>
+        <div class="btn play" onclick="toggleMusic()"></div>
+        <div class="btn next" onclick="nextTrack()"></div>
+      </div>
+    </div>
+
+    <script>
+      let score = 0;
+      let bunnyCount = 1;
+      let idleTimer;
+
+      const scoreEl = document.getElementById("score");
+
+      const music = document.getElementById("bgMusic");
+
+      const tracks = [
+        "https://res.cloudinary.com/dnxk3qkqz/video/upload/v1776557808/ETA_jrggdx.mp3",
+        "https://res.cloudinary.com/dnxk3qkqz/video/upload/v1776557807/zero_tdqppi.mp3",
+        "https://res.cloudinary.com/dnxk3qkqz/video/upload/v1776557789/omg_yej0jq.mp3",
+        "https://res.cloudinary.com/dnxk3qkqz/video/upload/v1776557789/super_shy_dikc4x.mp3",
+        "https://res.cloudinary.com/dnxk3qkqz/video/upload/v1776557787/attention_ufwdl3.mp3",
+        "https://res.cloudinary.com/dnxk3qkqz/video/upload/v1776557762/cookie_mbt414.mp3",
+        "https://res.cloudinary.com/dnxk3qkqz/video/upload/v1776557761/hurt_pyyfvw.mp3",
+        "https://res.cloudinary.com/dnxk3qkqz/video/upload/v1776557760/supernatural_boaucr.mp3",
+        "https://res.cloudinary.com/dnxk3qkqz/video/upload/v1776557740/bubble_gum_nhitgl.mp3",
+        "https://res.cloudinary.com/dnxk3qkqz/video/upload/v1776557739/how_sweet_cn5swc.mp3",
+        "https://res.cloudinary.com/dnxk3qkqz/video/upload/v1776557736/get_up_wk9nm9.mp3",
+        "https://res.cloudinary.com/dnxk3qkqz/video/upload/v1776557716/ditto_ny1f34.mp3",
+        "https://res.cloudinary.com/dnxk3qkqz/video/upload/v1776557716/new_jeans_xa2npi.mp3",
+        "https://res.cloudinary.com/dnxk3qkqz/video/upload/v1776557716/cool_with_you_h4qu9n.mp3",
+        "https://res.cloudinary.com/dnxk3qkqz/video/upload/v1776557692/gods_bkef2z.mp3",
+        "https://res.cloudinary.com/dnxk3qkqz/video/upload/v1776557692/hype_boy_by1ppv.mp3",
+        "https://res.cloudinary.com/dnxk3qkqz/video/upload/v1776557692/right_now_rw8hy8.mp3",
+        "https://res.cloudinary.com/dnxk3qkqz/video/upload/v1776557225/asap_epho69.mp3",
+      ];
+
+      let currentTrack = 0;
+      let musicStarted = false;
+
+      function loadTrack(index) {
+        currentTrack = index;
+
+        if (currentTrack >= tracks.length) currentTrack = 0;
+        if (currentTrack < 0) currentTrack = tracks.length - 1;
+
+        music.pause(); // 💥 важно
+        music.src = tracks[currentTrack];
+        music.currentTime = 0;
+        music.load(); // 💥 важно
+        music.play();
+
+        document.getElementById("playerImg").src = "player.png";
+      }
+
+      function startMusic() {
+        if (!musicStarted) {
+          loadTrack(0);
+          music.volume = 0.3;
+          musicStarted = true;
+        }
+      }
+
+      function nextTrack() {
+        loadTrack(currentTrack + 1);
+      }
+
+      function prevTrack() {
+        loadTrack(currentTrack - 1);
+      }
+
+      function toggleMusic() {
+        const img = document.getElementById("playerImg");
+
+        if (music.paused) {
+          music.play();
+          img.src = "player.png";
+        } else {
+          music.pause();
+          img.src = "playerplay.png";
+        }
+      }
+
+      music.onended = () => {
+        loadTrack(currentTrack + 1);
+      };
+
+      function spawnBunny() {
+        const bunny = document.createElement("img");
+
+        bunny.src = "bunnytest.png";
+
+        bunny.className = "bunny";
+
+        moveBunny(bunny);
+
+        bunny.onclick = () => {
+          bunny.remove(); // удаляем ТОЛЬКО его
+
+          score += 10;
+          scoreEl.textContent = score;
+
+          spawnBunny(); // добавляем нового
+
+          // каждые 5 очков увеличиваем сложность
+          if (score % 50 === 0 && bunnyCount < 6) {
+            bunnyCount++;
+            spawnBunny();
+          }
+
+          // шанс появления босса
+          if (Math.random() < 0.08) {
+            spawnBoss();
+          }
+
+          startMusic();
+          resetIdleTimer();
+        };
+        document.body.appendChild(bunny);
+      }
+
+      function spawnBoss() {
+        const boss = document.createElement("model-viewer");
+
+        boss.src = "./bunny.glb";
+        boss.className = "boss";
+        boss.style.transform = "translate(-50%, -50%)";
+        boss.setAttribute("auto-rotate", "");
+        boss.setAttribute("rotation-per-second", "35deg");
+
+        boss.setAttribute("camera-orbit", "0deg 75deg 900%");
+        boss.setAttribute("field-of-view", "25deg");
+
+        boss.setAttribute("animation-name", "*");
+        boss.setAttribute("autoplay", "");
+        boss.style.transform = "translate(-50%, -50%)";
+
+        boss.setAttribute("disable-zoom", "");
+        boss.setAttribute("interaction-prompt", "none");
+
+        moveBoss(boss);
+
+        // 💥 клик
+        boss.onclick = () => {
+          score += 500;
+          scoreEl.textContent = score;
+
+          boss.remove();
+        };
+
+        document.body.appendChild(boss);
+
+        // ⏱ исчезает через 4 секунды
+        setTimeout(() => {
+          boss.remove();
+        }, 4000);
+
+        // 🏃 двигается каждые 0.5 сек
+        const interval = setInterval(() => {
+          if (!document.body.contains(boss)) {
+            clearInterval(interval);
+            return;
+          }
+          moveBoss(boss);
+        }, 500);
+      }
+
+      function moveBunny(el) {
+        const width = el.offsetWidth || 60;
+        const height = el.offsetHeight || 60;
+
+        el.style.left = Math.random() * (window.innerWidth - width) + "px";
+        el.style.top = Math.random() * (window.innerHeight - height) + "px";
+      }
+      function moveBoss(el) {
+        const padding = 40;
+
+        const x = padding + Math.random() * (window.innerWidth - padding * 2);
+        const y = padding + Math.random() * (window.innerHeight - padding * 2);
+
+        el.style.left = x + "px";
+        el.style.top = y + "px";
+      }
+
+      function resetIdleTimer() {
+        clearTimeout(idleTimer);
+
+        idleTimer = setTimeout(() => {
+          // 💥 удаляем всех обычных кролей
+          const all = document.querySelectorAll(".bunny");
+          all.forEach((b) => b.remove());
+
+          // ✨ создаём заново
+          for (let i = 0; i < bunnyCount; i++) {
+            spawnBunny();
+          }
+        }, 7000); // 7 секунд
+      }
+
+      for (let i = 0; i < bunnyCount; i++) {
+        spawnBunny();
+      }
+      resetIdleTimer();
+    </script>
+  </body>
+</html>
