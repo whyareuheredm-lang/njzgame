@@ -104,14 +104,137 @@ body {
 }
 #score {
   position: fixed;
-  top: 20px;
-  left: 20px;
+
+  top: 55px;
+  left: -10px;
 
   font-family: "Press Start 2P", cursive;
+
   font-size: 10px;
+
   color: white;
 
   z-index: 10;
 
   text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 20px #ff00ff;
+
+  transition: font-size 0.2s ease;
+}
+
+.bomb {
+  position: fixed;
+  width: 120px;
+  z-index: 20;
+  cursor: pointer;
+
+  animation: bombFloat 0.8s infinite ease-in-out,
+    bombGlow 0.4s infinite alternate;
+}
+
+@keyframes bombFloat {
+  0% {
+    transform: rotate(-3deg) scale(1);
+  }
+
+  50% {
+    transform: rotate(3deg) scale(1.05);
+  }
+
+  100% {
+    transform: rotate(-3deg) scale(1);
+  }
+}
+
+@keyframes bombGlow {
+  from {
+    filter: drop-shadow(0 0 5px orange) drop-shadow(0 0 10px yellow);
+  }
+
+  to {
+    filter: drop-shadow(0 0 20px orange) drop-shadow(0 0 40px yellow);
+  }
+}
+
+.boom {
+  animation: screenShake 0.3s;
+  background: white;
+}
+
+@keyframes screenShake {
+  0% {
+    transform: translate(0);
+  }
+
+  25% {
+    transform: translate(-10px, 5px);
+  }
+
+  50% {
+    transform: translate(10px, -5px);
+  }
+
+  75% {
+    transform: translate(-5px, -10px);
+  }
+
+  100% {
+    transform: translate(0);
+  }
+}
+
+.bonus-text {
+  position: fixed;
+
+  top: 50%;
+  left: 50%;
+
+  transform: translate(-50%, -50%);
+
+  z-index: 9999;
+
+  font-family: "Press Start 2P", cursive;
+  font-size: 28px;
+
+  white-space: nowrap;
+
+  pointer-events: none;
+
+  text-shadow: 0 0 10px white, 0 0 20px white, 0 0 40px white;
+
+  animation: jackpotPop 1.2s ease-out forwards,
+    jackpotPulse 0.3s infinite alternate;
+}
+
+@keyframes jackpotPop {
+  0% {
+    opacity: 0;
+
+    transform: translate(-50%, -50%) scale(0.3);
+  }
+
+  20% {
+    opacity: 1;
+
+    transform: translate(-50%, -50%) scale(1.4);
+  }
+
+  40% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  100% {
+    opacity: 0;
+
+    transform: translate(-50%, -90%) scale(1.2);
+  }
+}
+
+@keyframes jackpotPulse {
+  from {
+    filter: brightness(1) drop-shadow(0 0 10px white);
+  }
+
+  to {
+    filter: brightness(1.4) drop-shadow(0 0 30px white);
+  }
 }

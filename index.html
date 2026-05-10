@@ -14,63 +14,165 @@
     ></script>
 
     <style>
-      body {
-          margin: 0;
-            overflow: hidden;
+                                            body {
+                                                margin: 0;
+                                                  overflow: hidden;
 
-              background: url("binkyb.png") center/cover no-repeat;
+                                                    background: url("binkyb.png") center/cover no-repeat;
 
-      }
+                                            }
 
-      #score {
-        position: fixed;
-        top: 20px;
-        left: 20px;
-        color: white;
-        font-size: 20px;
-        z-index: 10;
-      }
+                                            #score {
+                                              position: fixed;
+                                              top: 20px;
+                                              left: 20px;
+                                              color: white;
+                                              font-size: 20px;
+                                              z-index: 10;
+                                            }
 
-      .bunny {
-        position: fixed;
-        width: 60px;
-        cursor: pointer;
-        transition: transform 0.2s;
-        z-index:5;
-      }
+                                            .bunny {
+                                              position: fixed;
+                                              width: 60px;
+                                              cursor: pointer;
+                                              transition:
+                                                  left 1s linear,
+                                                    top 1s linear;
+                                              z-index:5;
+                          animation: bunnyWiggle 1.5s infinite ease-in-out;
+                                            }
 
-      .bunny:active {
-        transform: scale(0.8);
-      }
+                    bunny:active {
+                    scale: 0.8;
+                    }
+      @keyframes bunnyWiggle {
+          0% {
+              transform:
+                    rotate(-5deg)
+                          scale(1);
+                            }
 
-      .boss {
-        position: fixed;
-        width: 60px;
+                              25% {
+                                  transform:
+                                        rotate(5deg)
+                                              scale(1.12);
+                                                }
 
-        overflow: visible; /* * BAЖНO */
+                                                  50% {
+                                                      transform:
+                                                            rotate(-5deg)
+                                                                  scale(1);
+                                                                    }
 
-        z-index: 5;
-        cursor: pointer;
-        animation: float 2s ease-in-out infinite;
-      }
+                                                                      75% {
+                                                                          transform:
+                                                                                rotate(5deg)
+                                                                                      scale(1.14);
+                                                                                        }
 
-      @keyframes float {
-        0% {
-          transform: translateY(0px);
-        }
-        50% {
-          transform: translateY(-20px);
-        }
-        100% {
-          transform: translateY(0px);
-        }
-        button
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        z-index: 10;
+                                                                                          100% {
+                                                                                              transform:
+                                                                                                    rotate(-5deg)
+                                                                                                          scale(1);
+                                                                                                            }
+                                                                                                            }
 
-      }
+
+
+
+                                .spin {
+                                    animation: bunnySpin 0.8s linear;
+                                    bunnyWiggle 0.6s infinite ease-in-out;
+
+                                 }
+
+            .evil {
+                filter:
+                    brightness(1.5)
+                        saturate(8)
+                            hue-rotate(-40deg)
+                                drop-shadow(0 0 15px red)
+                                    drop-shadow(0 0 30px red)
+                                        drop-shadow(0 0 45px red);
+                                        }
+
+
+                                    @keyframes evilPulse {
+                                from {
+                                    scale: 1;
+                                      }
+
+                                        to {
+                                            scale: 1.08;
+                                              }
+                                              }
+
+
+
+                                @keyframes bunnySpin {
+                                    from {
+                                        transform: rotate(0deg);
+                                          }
+
+                                            to {
+                                                transform: rotate(360deg);
+                                                  }
+                                                }
+
+
+                                            .bunny:active {
+                                          scale: 0,8;
+                                         }
+
+                                            .boss {
+                                              position: fixed;
+
+                                              width: 70px;
+                                              height: 70px;
+
+
+                                              contain: none;
+
+                                              background: transparent;
+
+
+
+
+
+
+
+                                              z-index: 5;
+                                              cursor: pointer;
+                                              animation: float 2s ease-in-out infinite;
+                                            }
+
+                                            /* Добавь ЭТО — пробиваем shadow DOM model-viewer */
+                                            .boss::part(default) {
+                                              overflow: visible;
+                                              }
+
+                                              model-viewer {
+                                                overflow: visible;
+                                                  --poster-color: transparent;
+                                                  }
+
+                                            @keyframes float {
+                                              0% {
+                                                transform: translateY(0px);
+                                              }
+                                              50% {
+                                                transform: translateY(-20px);
+                                              }
+                                              100% {
+                                                transform: translateY(0px);
+                                              }
+                                              button
+                                              position: fixed;
+                                              top: 20px;
+                                              right: 20px;
+                                              z-index: 10;
+
+                                            }
     </style>
   </head>
 
@@ -84,7 +186,7 @@
       <img src="player.png" class="player-bg" id="playerImg" />
 
       <div class="controls">
-        <div class="btn prev" onclick="nextTrack()"></div>
+        <div class="btn prev" onclick="prevTrack()"></div>
         <div class="btn play" onclick="toggleMusic()"></div>
         <div class="btn next" onclick="nextTrack()"></div>
       </div>
@@ -96,6 +198,14 @@
       let idleTimer;
 
       const scoreEl = document.getElementById("score");
+
+      const boomSound = new Audio("danibomb.wav");
+
+      boomSound.volume = 0.7;
+
+      const warningSound = new Audio("warning1.mp3");
+
+      warningSound.volume = 0.7;
 
       const music = document.getElementById("bgMusic");
 
@@ -173,17 +283,65 @@
       function spawnBunny() {
         const bunny = document.createElement("img");
 
-        bunny.src = "bunnytest.png";
+        const isEvil = Math.random() < 0.15;
+
+        if (isEvil) {
+          bunny.src = "redbunny.png";
+          bunny.classList.add("evil");
+
+          setInterval(() => {
+            bunny.style.scale = bunny.style.scale === "1.1" ? "1" : "1.1";
+          }, 300);
+
+          setTimeout(() => {
+            bunny.remove();
+          }, 3000);
+        } else {
+          bunny.src = "bunnytest.png";
+        }
 
         bunny.className = "bunny";
 
         moveBunny(bunny);
+        animateBunny(bunny);
 
         bunny.onclick = () => {
           bunny.remove(); // удаляем ТОЛЬКО его
 
-          score += 10;
+          if (isEvil) {
+            warningSound.currentTime = 0;
+
+            warningSound.play();
+
+            score -= 1000;
+          } else {
+            score += 10;
+          }
+
           scoreEl.textContent = score;
+          if (score <= -100) {
+            scoreEl.style.fontSize = "8px";
+          } else if (score <= -10) {
+            scoreEl.style.fontSize = "9px";
+          } else {
+            scoreEl.style.fontSize = "12px";
+          }
+
+          if (isEvil) {
+            scoreEl.style.color = "red";
+
+            setTimeout(() => {
+              scoreEl.style.color = "white";
+            }, 300);
+          }
+
+          if (score >= 1000) {
+            scoreEl.style.fontSize = "10px";
+          }
+
+          if (score >= 10000) {
+            scoreEl.style.fontSize = "8px";
+          }
 
           spawnBunny(); // добавляем нового
 
@@ -204,21 +362,86 @@
         document.body.appendChild(bunny);
       }
 
+      function spawnBomb() {
+        const bomb = document.createElement("img");
+
+        bomb.src = "bombb.png";
+
+        bomb.classList.add("bomb");
+
+        bomb.style.left = Math.random() * (window.innerWidth - 120) + "px";
+
+        bomb.style.top = Math.random() * (window.innerHeight - 120) + "px";
+
+        bomb.onclick = () => {
+          boomSound.currentTime = 0;
+
+          boomSound.play();
+
+          // 💥 экран трясётсятрясётся
+          document.body.classList.add("boom");
+
+          setTimeout(() => {
+            document.body.classList.remove("boom");
+          }, 300);
+
+          // 🐰 удалить bunny
+          document.querySelectorAll(".bunny").forEach((b) => b.remove());
+
+          // 💰 бонус
+          score += 5000;
+
+          const bonus = document.createElement("div");
+
+          bonus.classList.add("bonus-text");
+
+          bonus.innerHTML = `
+                    <span style="color:#4da6ff">+</span>
+                    <span style="color:#ff66cc">5</span>
+                    <span style="color:#ffd84d">0</span>
+                    <span style="color:#66ff99">0</span>
+                    <span style="color:#c084ff">0</span>
+                    `;
+
+          document.body.appendChild(bonus);
+
+          setTimeout(() => {
+            bonus.remove();
+          }, 1000);
+
+          scoreEl.textContent = score;
+
+          // 💣 удалить bomb
+          bomb.remove();
+
+          // 🐰 заново спавним bunny
+          for (let i = 0; i < bunnyCount; i++) {
+            spawnBunny();
+          }
+        };
+
+        document.body.appendChild(bomb);
+
+        // исчезает сама
+        setTimeout(() => {
+          bomb.remove();
+        }, 5000);
+      }
+
       function spawnBoss() {
         const boss = document.createElement("model-viewer");
 
-        boss.src = "./bunny.glb";
+        boss.src = "./bbunny.glb";
         boss.className = "boss";
-        boss.style.transform = "translate(-50%, -50%)";
+
         boss.setAttribute("auto-rotate", "");
         boss.setAttribute("rotation-per-second", "35deg");
 
-        boss.setAttribute("camera-orbit", "0deg 75deg 900%");
+        boss.setAttribute("camera-orbit", "0deg 75deg 1000%");
         boss.setAttribute("field-of-view", "25deg");
 
         boss.setAttribute("animation-name", "*");
         boss.setAttribute("autoplay", "");
-        boss.style.transform = "translate(-50%, -50%)";
 
         boss.setAttribute("disable-zoom", "");
         boss.setAttribute("interaction-prompt", "none");
@@ -229,6 +452,17 @@
         boss.onclick = () => {
           score += 500;
           scoreEl.textContent = score;
+
+          if (Math.random() < 0.1) {
+            spawnBomb();
+          }
+          if (score >= 1000) {
+            scoreEl.style.fontSize = "10px";
+          }
+
+          if (score >= 10000) {
+            scoreEl.style.fontSize = "8px";
+          }
 
           boss.remove();
         };
@@ -257,8 +491,32 @@
         el.style.left = Math.random() * (window.innerWidth - width) + "px";
         el.style.top = Math.random() * (window.innerHeight - height) + "px";
       }
+      function animateBunny(el) {
+        const interval = setInterval(() => {
+          if (!document.body.contains(el)) {
+            clearInterval(interval);
+            return;
+          }
+
+          const x = Math.random() * (window.innerWidth - 80);
+
+          const y = Math.random() * (window.innerHeight - 80);
+
+          el.style.left = x + "px";
+          el.style.top = y + "px";
+
+          if (Math.random() < 0.2) {
+            el.classList.add("spin");
+
+            setTimeout(() => {
+              el.classList.remove("spin");
+            }, 800);
+          }
+        }, 1200);
+      }
+
       function moveBoss(el) {
-        const padding = 40;
+        const padding = 100;
 
         const x = padding + Math.random() * (window.innerWidth - padding * 2);
         const y = padding + Math.random() * (window.innerHeight - padding * 2);
@@ -271,21 +529,33 @@
         clearTimeout(idleTimer);
 
         idleTimer = setTimeout(() => {
-          // 💥 удаляем всех обычных кролей
-          const all = document.querySelectorAll(".bunny");
-          all.forEach((b) => b.remove());
+          const current = document.querySelectorAll(".bunny").length;
 
-          // ✨ создаём заново
-          for (let i = 0; i < bunnyCount; i++) {
+          for (let i = current; i < bunnyCount; i++) {
             spawnBunny();
           }
-        }, 7000); // 7 секунд
+        }, 15000);
       }
 
       for (let i = 0; i < bunnyCount; i++) {
         spawnBunny();
       }
       resetIdleTimer();
+      setInterval(() => {
+        if (Math.random() < 0.08) {
+          spawnBomb();
+        }
+      }, 5000);
+
+      setInterval(() => {
+        const alive = document.querySelectorAll(".bunny").length;
+
+        if (alive < bunnyCount) {
+          for (let i = alive; i < bunnyCount; i++) {
+            spawnBunny();
+          }
+        }
+      }, 1000);
     </script>
   </body>
 </html>
