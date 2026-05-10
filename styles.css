@@ -238,3 +238,75 @@ body {
     filter: brightness(1.4) drop-shadow(0 0 30px white);
   }
 }
+
+.warning-flash::after {
+  content: "";
+
+  position: fixed;
+
+  inset: 0;
+
+  background: rgba(255, 0, 0, 0.35);
+
+  pointer-events: none;
+
+  z-index: 99999;
+
+  animation: warningFlash 0.25s forwards;
+}
+
+@keyframes warningFlash {
+  0% {
+    opacity: 0;
+  }
+
+  15% {
+    opacity: 1;
+  }
+
+  30% {
+    opacity: 0;
+  }
+
+  45% {
+    opacity: 1;
+  }
+
+  60% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+.boss-flash::after {
+  content: "";
+
+  position: fixed;
+
+  inset: 0;
+
+  background: rgba(120, 255, 170, 0.18);
+
+  pointer-events: none;
+
+  z-index: 99999;
+
+  animation: bossFlash 0.4s forwards;
+}
+
+@keyframes bossFlash {
+  0% {
+    opacity: 0;
+  }
+
+  20% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}

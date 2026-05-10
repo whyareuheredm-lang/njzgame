@@ -205,6 +205,10 @@
 
       const warningSound = new Audio("warning1.mp3");
 
+      const bossSound = new Audio("bossv.mp3");
+
+      bossSound.volume = 1;
+
       warningSound.volume = 0.7;
 
       const music = document.getElementById("bgMusic");
@@ -312,6 +316,12 @@
             warningSound.currentTime = 0;
 
             warningSound.play();
+
+            document.body.classList.add("warning-flash");
+
+            setTimeout(() => {
+              document.body.classList.remove("warning-flash");
+            }, 250);
 
             score -= 1000;
           } else {
@@ -450,6 +460,15 @@
 
         // 💥 клик
         boss.onclick = () => {
+          bossSound.currentTime = 0;
+          bossSound.play();
+
+          document.body.classList.add("boss-flash");
+
+          setTimeout(() => {
+            document.body.classList.remove("boss-flash");
+          }, 400);
+
           score += 500;
           scoreEl.textContent = score;
 
